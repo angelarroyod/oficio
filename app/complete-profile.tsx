@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Alert, StyleSheet } from 'react-native';
 import { z } from 'zod';
 
-import { Button, Card, Input, Screen, Text } from '@/components';
+import { Button, Card, IconTile, Input, Screen, Text } from '@/components';
 import { createProfile } from '@/features/auth/api';
 import { copy } from '@/lib/copy';
 import { fullNameSchema } from '@/lib/zod';
@@ -53,6 +53,9 @@ export default function CompleteProfileScreen() {
       <Text variant="h1" style={styles.title}>
         {copy.auth.completeProfileTitle}
       </Text>
+      <Text variant="bodySm" color="textSecondary" style={styles.lead}>
+        {copy.auth.completeProfileSubtitle}
+      </Text>
 
       {!pendingRole ? (
         <>
@@ -61,14 +64,22 @@ export default function CompleteProfileScreen() {
           </Text>
           <Card
             onPress={() => setRole('client')}
-            style={[styles.roleCard, role === 'client' && styles.roleSelected]}
+            variant={role === 'client' ? 'accent' : 'outline'}
+            style={styles.roleCard}
           >
+            <IconTile name="home-outline" />
             <Text variant="title">{copy.auth.roleClient}</Text>
           </Card>
           <Card
             onPress={() => setRole('provider')}
-            style={[styles.roleCard, role === 'provider' && styles.roleSelected]}
+            variant={role === 'provider' ? 'accent' : 'outline'}
+            style={styles.roleCard}
           >
+            <IconTile
+              name="hammer-outline"
+              color={theme.colors.accent}
+              background={theme.colors.accentTint}
+            />
             <Text variant="title">{copy.auth.roleProvider}</Text>
           </Card>
         </>
@@ -93,6 +104,7 @@ export default function CompleteProfileScreen() {
 
       <Button
         title={copy.common.continue}
+        size="lg"
         onPress={onSubmit}
         loading={busy}
         disabled={!role}
@@ -102,9 +114,14 @@ export default function CompleteProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { marginTop: theme.spacing.xl, marginBottom: theme.spacing.xl },
+  title: { marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs },
+  lead: { marginBottom: theme.spacing.xl },
   sectionTitle: { marginBottom: theme.spacing.md },
-  roleCard: { marginBottom: theme.spacing.md },
-  roleSelected: { borderColor: theme.colors.primary, borderWidth: 2 },
+  roleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
   field: { marginTop: theme.spacing.md, marginBottom: theme.spacing.lg },
 });

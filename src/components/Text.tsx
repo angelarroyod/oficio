@@ -6,6 +6,8 @@ type Props = RNTextProps & {
   variant?: TypographyVariant;
   color?: ColorToken;
   center?: boolean;
+  /** Tabular figures — use for money, counters and anything that stacks in a column. */
+  numeric?: boolean;
 };
 
 /**
@@ -16,6 +18,7 @@ export function Text({
   variant = 'body',
   color = 'text',
   center = false,
+  numeric = false,
   style,
   maxFontSizeMultiplier,
   ...rest
@@ -25,8 +28,10 @@ export function Text({
     fontSize: scale.fontSize,
     lineHeight: scale.lineHeight,
     fontWeight: scale.fontWeight,
+    letterSpacing: scale.letterSpacing,
     color: theme.colors[color],
     ...(center ? { textAlign: 'center' } : null),
+    ...(numeric ? { fontVariant: ['tabular-nums'] } : null),
   };
   return (
     <RNText

@@ -12,8 +12,8 @@ import { theme } from '@/theme';
 
 import { Text } from './Text';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
-type Size = 'md' | 'lg';
+type Variant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger';
+type Size = 'sm' | 'md' | 'lg';
 
 type Props = Omit<PressableProps, 'style' | 'children'> & {
   title: string;
@@ -23,15 +23,17 @@ type Props = Omit<PressableProps, 'style' | 'children'> & {
   disabled?: boolean;
   fullWidth?: boolean;
   leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
 const containerByVariant: Record<Variant, ViewStyle> = {
-  primary: { backgroundColor: theme.colors.primary },
+  primary: { backgroundColor: theme.colors.primary, boxShadow: theme.elevation.primary },
+  accent: { backgroundColor: theme.colors.accent, boxShadow: theme.elevation.accent },
   secondary: {
     backgroundColor: theme.colors.surface,
     borderWidth: theme.layout.hairline,
-    borderColor: theme.colors.primary,
+    borderColor: theme.colors.primaryBorder,
   },
   ghost: { backgroundColor: 'transparent' },
   danger: { backgroundColor: theme.colors.danger },
@@ -39,17 +41,19 @@ const containerByVariant: Record<Variant, ViewStyle> = {
 
 const textColorByVariant: Record<Variant, Parameters<typeof Text>[0]['color']> = {
   primary: 'textOnPrimary',
+  accent: 'textOnPrimary',
   secondary: 'primary',
   ghost: 'primary',
   danger: 'textOnPrimary',
 };
 
-const heightBySize: Record<Size, number> = {
-  md: theme.layout.minTouchTarget,
-  lg: 52,
+const bySize: Record<Size, { height: number; text: 'title' | 'label'; px: number }> = {
+  sm: { height: 36, text: 'label', px: theme.spacing.md },
+  md: { height: theme.layout.minTouchTarget, text: 'title', px: theme.spacing.lg },
+  lg: { height: 54, text: 'title', px: theme.spacing.xl },
 };
 
-/** Accessible button: >=44pt target, loading + disabled states, four variants. */
+/** Accessible button: >=44pt target, loading + disabled states, five variants. */
 export function Button({
   title,
   variant = 'primary',
@@ -58,14 +62,14 @@ export function Button({
   disabled = false,
   fullWidth = true,
   leftIcon,
+  rightIcon,
   style,
   ...rest
 }: Props) {
   const isInert = disabled || loading;
-  const spinnerColor =
-    variant === 'primary' || variant === 'danger'
-      ? theme.colors.textOnPrimary
-      : theme.colors.primary;
+  const s = bySize[size];
+  const solid = variant === 'primary' || variant === 'accent' || variant === 'danger';
+  const spinnerColor = solid ? theme.colors.textOnPrimary : theme.colors.primary;
 
   return (
     <Pressable
@@ -75,10 +79,11 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         containerByVariant[variant],
-        { minHeight: heightBySize[size] },
+        { minHeight: s.height, paddingHorizontal: s.px },
         fullWidth && styles.fullWidth,
         pressed && !isInert && styles.pressed,
         isInert && styles.inert,
+        isInert && solid && styles.inertSolid,
         style,
       ]}
       {...rest}
@@ -88,9 +93,10 @@ export function Button({
       ) : (
         <View style={styles.content}>
           {leftIcon}
-          <Text variant="title" color={textColorByVariant[variant]}>
+          <Text variant={s.text} color={textColorByVariant[variant]}>
             {title}
           </Text>
+          {rightIcon}
         </View>
       )}
     </Pressable>
@@ -100,12 +106,15 @@ export function Button({
 const styles = StyleSheet.create({
   base: {
     borderRadius: theme.radius.md,
-    paddingHorizontal: theme.spacing.lg,
+    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
   },
   fullWidth: { alignSelf: 'stretch' },
   content: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
-  pressed: { opacity: 0.85 },
-  inert: { opacity: 0.5 },
+  pressed: { opacity: 0.9, transform: [{ scale: 0.985 }] },
+  inert: { opacity: 0.45 },
+  // A disabled solid button keeps its shape but drops the lift — a shadow on an
+  // inert control reads as pressable.
+  inertSolid: { boxShadow: theme.elevation.none },
 });

@@ -43,3 +43,23 @@ source of truth for everything not listed here.
 Done: project scaffold (SDK 57, strict TS, expo-router, typed routes), design tokens + 8 base components, lib layer (supabase/secure-store, query persistence, es-MX copy, MXN/IVA/window formatting, zod schemas), full schema + triggers + RLS applied to live project, auth screens (role select → email OTP → verify; Google; Apple gated), role-guarded tab navigation (4 client tabs, 5 provider tabs), sign-out.
 
 Verified: `tsc --noEmit` clean; web boot; welcome → sign-in navigation; OTP request hits live Supabase (email delivered); signed-out guard branch. Role-tab branches pending the email-template fix above (then verifiable end-to-end in Expo Go).
+
+## Sprint 2 — screens + design system (2026-09-02)
+
+Placeholders replaced with the real product. Deltas against the Sprint 1 baseline:
+
+| Area | Decision | Rationale |
+|---|---|---|
+| Navigation | **Stack per role, tabs inside it** (`(client)/_layout` → `(tabs)` + detail routes) | Detail screens must push over the tab bar with a back button. A flat `Tabs` layout can only replace tab content. |
+| Accent color | **Copper added** beside the trust blue | Blue alone reads institutional and cold. Copper carries the trade and marks exactly one hero action per screen. |
+| Trade identity | **One hue per oficio**, used in icon tiles and chips | A feed of six trades becomes scannable before any label is read — the single highest-leverage visual decision in the app. |
+| Elevation | **`boxShadow` strings**, `borderCurve: 'continuous'` | Legacy `shadow*` / `elevation` props are deprecated on the New Architecture. |
+| Photos | **Private buckets + 1-hour signed URLs** (migration `0014`) | Request photos show the inside of a home; a public bucket URL outlives the request, the job and the block list. |
+| Scheduling UI | **Day chips + 2-hour window chips**, no date picker | Matches the `jobs_window_length` constraint and the product promise. A datetime picker would invite exact times, which is the thing the product refuses to sell. |
+| Provider feed | **No client-side filtering** beyond the trade toggle | `requests_select_provider_feed` already restricts rows by trade and radius. Filtering twice invites the two rules to drift apart. |
+| Quote totals | **One implementation in `lib/format`**, asserted against the trigger's rounding | `validate_quote()` rejects a mismatch over one centavo, so the client formula is a contract, not a convenience. |
+| Tests | **`scripts/checks.mts`, run by `npm run check`** | Node runs TypeScript directly; the money and distance math get a real check without a test framework to maintain. `quoteTotals` lives in `lib/format` and `distanceKm` in `lib/geo` precisely so they stay importable without React Native. |
+| Provider onboarding | **`(provider)/setup` reachable from an empty feed** | The feed policy needs trades *and* a base point. Without them the correct feed is empty, so the empty state has to be the fix, not a dead end. |
+
+Still open: the Supabase email-template fix (Sprint 1 blocker) gates end-to-end verification of every
+screen below sign-in. Migration `0014_storage_buckets.sql` has not been applied to the live project yet.

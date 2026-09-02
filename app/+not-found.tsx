@@ -1,22 +1,19 @@
-import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { Screen, Text } from '@/components';
-import { theme } from '@/theme';
+import { EmptyState, Screen } from '@/components';
+import { copy } from '@/lib/copy';
 
 export default function NotFoundScreen() {
+  const router = useRouter();
   return (
     <Screen bottomInset>
-      <Text variant="h2" style={styles.title}>
-        Pantalla no encontrada
-      </Text>
-      <Link href="/">
-        <Text color="primary">Volver al inicio</Text>
-      </Link>
+      <EmptyState
+        icon="compass-outline"
+        title="Pantalla no encontrada"
+        body="La ruta que abriste ya no existe."
+        actionLabel={copy.common.back}
+        onAction={() => router.replace('/')}
+      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  title: { marginTop: theme.spacing.xxl, marginBottom: theme.spacing.md },
-});
