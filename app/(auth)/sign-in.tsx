@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -73,6 +74,9 @@ export default function SignInScreen() {
       <Text variant="h1" style={styles.title}>
         {copy.auth.welcomeTitle}
       </Text>
+      <Text variant="bodySm" color="textSecondary" style={styles.lead}>
+        {copy.auth.welcomeSubtitle}
+      </Text>
 
       <Controller
         control={control}
@@ -95,6 +99,7 @@ export default function SignInScreen() {
 
       <Button
         title={copy.auth.sendCode}
+        size="lg"
         onPress={onEmailSubmit}
         loading={busy === 'email'}
         disabled={busy !== null}
@@ -111,6 +116,7 @@ export default function SignInScreen() {
       <Button
         title={copy.auth.googleSignIn}
         variant="secondary"
+        leftIcon={<Ionicons name="logo-google" size={18} color={theme.colors.primary} />}
         onPress={onGoogle}
         loading={busy === 'google'}
         disabled={busy !== null}
@@ -121,6 +127,7 @@ export default function SignInScreen() {
         <Button
           title={copy.auth.appleSignIn}
           variant="secondary"
+          leftIcon={<Ionicons name="logo-apple" size={18} color={theme.colors.primary} />}
           onPress={onApple}
           loading={busy === 'apple'}
           disabled={busy !== null}
@@ -132,7 +139,8 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { marginTop: theme.spacing.xl, marginBottom: theme.spacing.xl },
+  title: { marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs },
+  lead: { marginBottom: theme.spacing.xl },
   field: { marginBottom: theme.spacing.lg },
   dividerRow: {
     flexDirection: 'row',

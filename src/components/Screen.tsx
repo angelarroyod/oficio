@@ -21,20 +21,23 @@ type Props = {
   padded?: boolean;
   /** Include bottom safe-area inset — use on screens without a tab bar. */
   bottomInset?: boolean;
+  /** Pinned action bar at the bottom (wizard CTAs, accept/send actions). */
+  footer?: ReactNode;
   style?: ViewStyle;
   contentStyle?: ViewStyle;
 };
 
 /**
  * Base screen chrome: background, safe areas, keyboard avoidance and the
- * global offline banner. Tab screens get top inset from the navigator header
- * when present; standalone screens handle their own via safe-area insets.
+ * global offline banner. Content is capped at layout.maxContentWidth and
+ * centered so the app stays composed on tablets and the web preview.
  */
 export function Screen({
   children,
   scroll = true,
   padded = true,
   bottomInset = false,
+  footer,
   style,
   contentStyle,
 }: Props) {
@@ -43,7 +46,9 @@ export function Screen({
 
   const inner = scroll ? (
     <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={[
         styles.content,
         padded && styles.padded,
@@ -67,6 +72,11 @@ export function Screen({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {inner}
+        {footer ? (
+          <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.md }]}>
+            {footer}
+          </View>
+        ) : null}
       </KeyboardAvoidingView>
     </View>
   );
@@ -75,6 +85,20 @@ export function Screen({
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   background: { backgroundColor: theme.colors.background },
-  content: { flexGrow: 1, paddingTop: theme.spacing.lg },
+  content: {
+    flexGrow: 1,
+    paddingTop: theme.spacing.lg,
+    width: '100%',
+    maxWidth: theme.layout.maxContentWidth,
+    alignSelf: 'center',
+  },
   padded: { paddingHorizontal: theme.layout.screenPadding },
+  footer: {
+    borderTopWidth: theme.layout.hairline,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
 });

@@ -1,4 +1,13 @@
-import { colors, layout, radius, shadow, spacing, typography } from './tokens';
+import {
+  colors,
+  elevation,
+  layout,
+  motion,
+  radius,
+  spacing,
+  tradeColors,
+  typography,
+} from './tokens';
 
 export const theme = {
   colors,
@@ -6,7 +15,9 @@ export const theme = {
   radius,
   typography,
   layout,
-  shadow,
+  elevation,
+  motion,
+  tradeColors,
 } as const;
 
 export type Theme = typeof theme;
