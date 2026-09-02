@@ -93,6 +93,22 @@ Request and completion photos live in **private** Supabase Storage buckets and a
 one-hour signed URLs. A photo of the inside of someone's home should not stay reachable by anyone who
 once saw the link — which a public bucket cannot promise.
 
+## Dependency advisories
+
+`npm audit` proposes `expo@46` as the "fix" for most alerts here. It is wrong — that is a
+twelve-major downgrade of the SDK. Upgrades stay inside SDK 57 (`npx expo install --fix`), and the
+two remaining transitive holes are pinned in `overrides`:
+
+| Package | Pin | Note |
+|---|---|---|
+| `decode-uri-component` | `^0.5.0` | Reached through `query-string` ← `expo-router`, so it parses real deep-link params. 0.5.0 is ESM-only; Metro bundles it fine, verified by round-tripping `%2B` / `%40` through a route param. |
+| `uuid` | `^11.1.1` | Reached through `xcode` ← `@expo/config-plugins`. v11 still ships a CJS build, so `require('uuid').v4()` keeps working. |
+
+**`image-size` (high, unpatched) is knowingly accepted.** Every published version is vulnerable — there
+is nothing to upgrade to. It reaches the tree through `metro`, so the parsers only run at bundle time
+over assets already in this repo; it is not reachable from user input at runtime. Revisit when Metro
+ships a version that drops or patches it.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
