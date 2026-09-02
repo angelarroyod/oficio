@@ -61,5 +61,15 @@ Placeholders replaced with the real product. Deltas against the Sprint 1 baselin
 | Tests | **`scripts/checks.mts`, run by `npm run check`** | Node runs TypeScript directly; the money and distance math get a real check without a test framework to maintain. `quoteTotals` lives in `lib/format` and `distanceKm` in `lib/geo` precisely so they stay importable without React Native. |
 | Provider onboarding | **`(provider)/setup` reachable from an empty feed** | The feed policy needs trades *and* a base point. Without them the correct feed is empty, so the empty state has to be the fix, not a dead end. |
 
+### Live project state (2026-09-02)
+
+The project `lpnjrbvrxlfjborkjvje` had auto-paused on the free tier. A paused project's hostname stops
+resolving, which looks exactly like deletion from the outside — it is not. Restoring it brought the
+whole schema back (9 tables, 12 enums, 11 functions, 25 policies); `0014_storage_buckets.sql` was then
+applied on top and recorded in `supabase_migrations.schema_migrations`. All 14 migrations are live.
+
+Security advisors report the same four intentionally-exposed `SECURITY DEFINER` functions as the
+Sprint 1 baseline, plus leaked-password protection (irrelevant — this app has no passwords).
+
 Still open: the Supabase email-template fix (Sprint 1 blocker) gates end-to-end verification of every
-screen below sign-in. Migration `0014_storage_buckets.sql` has not been applied to the live project yet.
+screen below sign-in. Google and Apple auth providers are still unconfigured; only email is enabled.
