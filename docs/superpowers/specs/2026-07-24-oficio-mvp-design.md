@@ -27,14 +27,19 @@ source of truth for everything not listed here.
 
 ## Known manual steps (Supabase dashboard — no API available)
 
-1. **Email templates** (Auth → Templates → *Confirm signup* and *Magic Link*): replace the link-only body with the 6-digit code. Minimum viable body:
-   ```html
-   <h2>Tu código de Oficio</h2>
-   <p>Ingresa este código en la app:</p>
-   <h1>{{ .Token }}</h1>
-   <p>Vence en 1 hora. Si no fuiste tú, ignora este correo.</p>
-   ```
-   Without this the in-app OTP flow cannot complete (default template only carries a localhost link — dead on a phone).
+1. **Email templates** (Authentication → Emails): paste `supabase/templates/otp.html` into **both**
+   *Confirm signup* and *Magic Link*, and set the subject to `Tu código de Oficio`.
+
+   Both templates must carry `{{ .Token }}`. The stock bodies ship a link only, and a link cannot
+   complete an in-app OTP flow — the app asks for six digits. Until this is done, sign-in cannot be
+   verified end to end.
+
+   Dashboard-only in practice: the Management API can set
+   `mailer_templates_magic_link_content` / `mailer_templates_confirmation_content`, and the CLI can
+   push `[auth.email.template.*]` from `config.toml`, but both need a personal access token. Pushing
+   a partial `config.toml` also overwrites unrelated remote auth settings with local defaults, so the
+   dashboard is the lower-risk path for two fields.
+
 2. **Google provider** (Auth → Providers): add OAuth client ID/secret when Google sign-in testing starts.
 3. **Apple provider**: at EAS-build stage.
 
